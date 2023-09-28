@@ -1,0 +1,1 @@
+SELECT book_title, isbn, availability FROM library;

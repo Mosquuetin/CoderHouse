@@ -1,0 +1,1 @@
+SELECT * FROM library WHERE publication_date >= '2022-01-01';
