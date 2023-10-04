@@ -80,11 +80,10 @@ INSERT INTO cartao_debito (id_conta_cliente, status)
 VALUES ('1', 'Ativo');
 
 INSERT INTO cartao_credito (id_conta_cliente, status)
-VALUES ('1', 'Ativo');
+VALUES ('1', 'Ativo');*/
 
 /*INSERT INTO transacoes (id_cliente, id_conta_cliente, id_cartao, valor, tipo, descricao, info_pagamento)
 VALUES ('1', '1', '1', 82.35, 'Debito', 'PAG LOJA 1', 'LOJA 1 - BH/MG');*/
-
 
 /*
 DELIMITER //
