@@ -80,12 +80,8 @@ INSERT INTO cartao_debito (id_conta_cliente, status)
 VALUES ('1', 'Ativo');
 
 INSERT INTO cartao_credito (id_conta_cliente, status)
-VALUES ('1', 'Ativo');*/
+VALUES ('1', 'Ativo');
 
-/*INSERT INTO transacoes (id_cliente, id_conta_cliente, id_cartao, valor, tipo, descricao, info_pagamento)
-VALUES ('1', '1', '1', 82.35, 'Debito', 'PAG LOJA 1', 'LOJA 1 - BH/MG');*/
-
-/*
 DELIMITER //
 CREATE TRIGGER depois_de_inserir_transacao_credito
 AFTER INSERT ON transacoes FOR EACH ROW
@@ -101,9 +97,7 @@ BEGIN
 END;
 //
 DELIMITER ;
-*/
 
-/*
 DELIMITER //
 CREATE TRIGGER depois_de_inserir_transacao_debito
 AFTER INSERT ON transacoes FOR EACH ROW
@@ -119,5 +113,10 @@ BEGIN
 END;
 //
 DELIMITER ;
-*/
 
+INSERT INTO transacoes (id_cliente, id_conta_cliente, id_cartao, valor, tipo, descricao, info_pagamento)
+VALUES ('1', '1', '1', 82.35, 'Debito', 'PAG LOJA 1', 'LOJA 1 - BH/MG');
+
+SELECT tr.id, tr.id_cliente, tr.id_cartao, tr.valor, tr.tipo, CONCAT(cl.primeiro_nome,' ',cl.ultimo_nome) AS nome_completo
+FROM transacoes AS tr
+LEFT JOIN cliente AS cl ON tr.id_cliente = cl.id;
