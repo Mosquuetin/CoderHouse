@@ -1,5 +1,4 @@
 CREATE DATABASE consultorio;
-CREATE DATABASE consultorio;
 
 USE consultorio;
 

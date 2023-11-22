@@ -1,5 +1,3 @@
-CREATE DATABASE bancoprivado;
-
 USE bancoprivado;
 
 CREATE TABLE cliente(
@@ -496,77 +494,73 @@ END;
 //
 DELIMITER ;
 
+USE bancoprivado;
 
--- - Criação de views
+SELECT * FROM transacoes;
 
--- - Quantidade de pacientes por turno - -- 
-create or replace view vw_pacientes_por_turno
-as
-select m.id_turno, 
-t.descricao_turno,
-count(p.id_paciente) as 'Total paciente por turno'
-from medico m 
-join paciente p on p.id_medico=m.id_medico 
-join turno t on t.id_turno=m.id_turno
-group by 1;
+-------------------------------------------------------
+CREATE OR REPLACE view view_total_saldo_fatura_cidade
+AS
+SELECT  SUBSTRING_INDEX(SUBSTRING_INDEX(info_pagamento, ' - ', 2), ' - ', -1) AS cidade,
+        ROUND(SUM(valor),2) AS valor_total
+FROM transacoes
+GROUP BY 1
+ORDER BY 2 DESC;
 
--- - Detalhes da ficha médica do paciente - --
-create or replace view vw_ficha_medica
-as
-select f.id_ficha as 'número da ficha', 
-concat(p.primeiro_nome, ' ', p.ultimo_nome) as 'nome completo',
-p.data_nascimento,
-m.descricao_medicamentos as 'nome do medicamento',
-d.descricao_diagnostico as 'diagnóstico', 
-e.descricao_exames as exames
-from ficha_do_paciente f
-join paciente p on p.id_paciente=f.id_paciente
-join medicamentos m on m.id_medicamentos=f.id_medicamentos
-join diagnostico d on d.id_diagnostico=f.id_diagnostico
-join exames e on e.id_exames=f.id_exames
-group by 1
-order by 1 asc;
+SELECT * FROM view_total_saldo_fatura_cidade;
 
--- - Os pacientes de cada médico e suas especialidades - --
-create or replace view vw_medico_paciente
-as
-select concat(m.primeiro_nome, ' ', m.ultimo_nome) as 'nome do médico',
-e.descricao_especialidade,
-concat(p.primeiro_nome, ' ', p.ultimo_nome) as 'nome do paciente'
-from medico m
-join paciente p on p.id_medico=m.id_medico
-join especialidade e on e.id_especialidade=m.id_especialidade
-order by 1 asc;
+-------------------------------------------------------
+CREATE OR REPLACE view view_total_saldo_fatura_estado
+AS
+SELECT  SUBSTRING_INDEX(SUBSTRING_INDEX(info_pagamento, ' - ', 3), ' - ', -1) AS estado,
+        ROUND(SUM(valor),2) AS valor_total
+FROM transacoes
+GROUP BY 1
+ORDER BY 2 DESC;
 
--- - Pacientes que estão fazendo uso de antibiótico
-create or replace view vw_pacientes_antibiotico
-as
-select concat(p.primeiro_nome, ' ', p.ultimo_nome) as 'nome do paciente'
-from paciente p
-join ficha_do_paciente f on p.id_paciente = f.id_paciente
-join medicamentos m on f.id_medicamentos = m.id_medicamentos
-where m.descricao_medicamentos = 'antibiótico';
+SELECT * FROM view_total_saldo_fatura_estado;
 
--- - Lista de diagnosticos mais recorrentes
-create or replace view vw_diag_recorrentes
-as
-select d.descricao_diagnostico,
-count(descricao_diagnostico) as 'Recorrências'
-from diagnostico d
-join ficha_do_paciente f on d.id_diagnostico=f.id_diagnostico
-group by 1
-order by 2 desc;
+-------------------------------------------------------
+CREATE OR REPLACE view view_total_saldo_fatura_loja
+AS
+SELECT  SUBSTRING_INDEX(SUBSTRING_INDEX(info_pagamento, ' - ', 1), ' - ', -1) AS loja,
+        ROUND(SUM(valor),2) AS valor_total
+FROM transacoes
+GROUP BY 1
+ORDER BY 2 DESC;
 
--- - Lista de exames mais solicitados
+SELECT * FROM view_total_saldo_fatura_loja;
 
-create or replace view vw_exames_solicitados
-as
-select e.descricao_exames,
-count(descricao_exames) as 'Pedidos de exame'
-from exames e
-join ficha_do_paciente f on e.id_exames=f.id_exames
-group by 1
-order by 2 desc;
+-------------------------------------------------------
+CREATE OR REPLACE view view_total_saldo_fatura_cliente
+AS
+SELECT CONCAT(c.primeiro_nome,' ',c.ultimo_nome) AS nome_completo, ROUND(SUM(t.valor),2) AS valor_total
+FROM transacoes AS t
+LEFT JOIN cliente AS c ON c.id = t.id_cliente
+GROUP BY 1
+ORDER BY 2 DESC;
+
+SELECT * FROM view_total_saldo_fatura_cliente;
+
+-------------------------------------------------------
+CREATE OR REPLACE view view_total_saldo_fatura_descricao
+AS
+SELECT descricao AS categoria, ROUND(SUM(valor),2) AS valor_total
+FROM transacoes 
+GROUP BY 1
+ORDER BY 2 DESC;
+
+SELECT * FROM view_total_saldo_fatura_descricao;
+
+-------------------------------------------------------
+CREATE OR REPLACE view view_total_saldo_fatura_mes
+AS
+SELECT MONTH(data_inclusao) AS mes_compra, ROUND(SUM(valor),2) AS valor_total
+FROM transacoes
+GROUP BY 1
+ORDER BY 2 DESC;
+
+SELECT * FROM view_total_saldo_fatura_mes;
 
 USE bancoprivado;
 
@@ -681,6 +675,7 @@ DELIMITER;
 SELECT * FROM transacoes;
 CALL AddDeleteLinhaTransacoes('Adicionar',1, 1, 1, 100.0, 'Credito', 'Compra de Eletrônicos', 'Americanas - São Paulo - SP',0);
 CALL AddDeleteLinhaTransacoes('Deletar',0, 0, 0, 0, '', '', '',498);
+
 
 USE bancoprivado;
 
@@ -797,5 +792,4 @@ VALUES (1, 1, 1, 100.0, 'Credito', 'Compra de Eletrônicos', 'Americanas - São 
 
 SELECT * FROM conta_cliente;
 SELECT * FROM log_conta_cliente;
-
 
